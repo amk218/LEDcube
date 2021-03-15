@@ -1,6 +1,2 @@
-# Microprocessors
-Repository for Physics Year 3 microprocessors lab
-
-A simple assembly program for PIC18 microprocessor
-
-Uses simple interrupts from timer0 to count up on PORTD
+# LED Cube
+This project involves a 4x4x4 LED matrix. The aim is to program the cube to display different patterns and to switch the cube on and off with an ambient light sensor 
