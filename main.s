@@ -1,15 +1,19 @@
 #include <xc.inc>
 
-extrn	DAC_Setup, DAC_Int_Hi
+extrn	DAC_Setup, DAC_Int_Hi, single_layer_test
 
 psect	code, abs
-rst:	org	0x0000	; reset vector
-	goto	start
-
-int_hi:	org	0x0008	; high vector, no low vector
-	goto	DAC_Int_Hi
 	
-start:	call	DAC_Setup
-	goto	$	; Sit in infinite loop
+setup:			    ; Set ports D-F as outputs and clear them
+	clrf	TRISD
+	clrf	LATD
+	clrf	TRISF
+	clrf	LATF
+	clrf	TRISE
+	clrf	LATE
 
-	end	rst
+start:
+	call	single_layer_test
+    
+
+	end	start
