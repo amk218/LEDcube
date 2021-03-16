@@ -1,6 +1,6 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi
+global	DAC_Setup, DAC_Int_Hi, High_priority_interrupt, Low_priority_interrupt, Interrupt_setup
     
 psect	dac_code, class=CODE
 	
@@ -20,9 +20,11 @@ DAC_Setup:
 	bsf	GIE		; Enable all interrupts
 	return
 	
-	end
-	
-High_priority_interupt:
+
+    
+    
+    
+High_priority_interrupt:
     ;check for button press
     ;go to change pattern
     ;check for light sensor
@@ -30,21 +32,7 @@ High_priority_interupt:
     ; reset flags
     ; return to main program
 
-Low_priority_interupt:		; checks flags, sends to correct code segment, resets flags
-    ; check timer flag
-    ; if flag set then call change_static_pattern
-    ; if not then return
-    ; reset flag
-    ; return to main program
-	
-	
-	
-change_static_pattern:		; Low priority interupt which will change the static pattern displayed every second
-    ;check if end of pattern
-    ;if no +8 to FSR1
-    ;if yes reset FSR1 to pattern start
-    ;reset interupt flag
-    ;return 
+
     
 Change_pattern:			; High priority interupt that will change the pattern cycle on button press
     ; +1 to pattern counter
