@@ -42,11 +42,12 @@ setup:			    ; Set ports D-F as outputs and clear them
 	
 start:
 	;call	light_sensor_loop
+	
+Pattern_select:
 	movlw	pattern_counter
 	addwf	W,W,A
 	addwf	PCL, F, A
 	   ; Lookup table goes here
-
 	
 	bra	$
 

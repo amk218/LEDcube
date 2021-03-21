@@ -31,7 +31,7 @@ High_priority_interrupt:
     bra	    change_pattern
     ;check for light sensor
     ;go to light override
-
+    bcf	    RBIF
     retfie  f
 
 
