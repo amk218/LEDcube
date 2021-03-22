@@ -28,7 +28,7 @@ load_to_RAM:
 	
 
 psect	udata_bank4 ; reserve data anywhere in RAM (here in 0x400)
-PatternArray:    ds 0x80 ; reserve 128 bytes for message data
+PatternArray:    ds 0xFF ; reserve 128 bytes for message data
 
 psect	data    
 	; ******* myTable, data in programme memory, and its length *****
@@ -62,6 +62,13 @@ PatternTable:
 	db	0b10000000, 0b11001110, 0b10000000, 0b11001110, 0b10000000, 0b11001110, 0b10000000, 0b11001110
 	db	0b00000000, 0b10001100,	0b00000000, 0b10001100, 0b00000000, 0b10001100, 0b00000000, 0b10001100
 	db	0b00000000, 0b00001000, 0b00000000, 0b00001000, 0b00000000, 0b00001000, 0b00000000, 0b00001000
+	
+	; Cross
+	db	0b00001111, 0b00001111, 0b11110000, 0b11110000, 0b11110000, 0b11110000, 0b00001111, 0b00001111
+	
+	; Half_filled
+	db	0b01111111, 0b00110001, 0b00110111, 0b00010000, 0b00010011, 0b00000000, 0b00000001, 0b00000000
 
-	myTable_l   EQU	152	; length of data
+
+	myTable_l   EQU	168	; length of data
 	align	2

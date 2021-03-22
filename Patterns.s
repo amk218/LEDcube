@@ -1,7 +1,8 @@
 #include <xc.inc>
 
-global	layer_by_layer, cube_frame
-global	small_and_big, vertical_sweep, diagonal_fill
+global	layer_by_layer, cube_frame, edges_column_cycle
+global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
+global	part_filled, cross
 
     
 psect   udata_acs
@@ -10,6 +11,9 @@ layer_counter: ds   1		; A counter to track layers
 delay_counter1:ds   1		; Counters for program delays
 delay_counter2:ds   1
 delay_counter3:ds   1
+delay_counter4:ds   1
+byte_counter:  ds   1
+nibble_counter:ds   1
 
     
 psect	patterns, class=CODE
@@ -50,22 +54,22 @@ layer_by_layer:			; lights up the layers going up, and down, and up, and down ..
 	
     layer_loop:
 	bsf	LATH, 0, A	; Light bottom layer
-	call	long_delay	; delay to visible speeds
+	call	very_long_delay	; delay to visible speeds
 	bsf	LATH, 1, A	; light 2nd layer
 	bcf	LATH, 0, A	; switch off first layer
-	call	long_delay	; repeat sequence
+	call	very_long_delay	; repeat sequence
 	bsf	LATH, 2, A
 	bcf	LATH, 1, A
-	call	long_delay
+	call	very_long_delay
 	bsf	LATH, 3, A
 	bcf	LATH, 2, A
-	call	long_delay	; Reached the top, going down
+	call	very_long_delay	; Reached the top, going down
 	bsf	LATH, 2, A
 	bcf	LATH, 3, A
-	call	long_delay
+	call	very_long_delay
 	bsf	LATH, 1, A
 	bcf	LATH, 2, A
-	call	long_delay
+	call	very_long_delay
 	bcf	LATH, 1, A
 	bra	layer_loop	; start again at the bottom
     	
@@ -94,7 +98,7 @@ small_and_big:			; Pattern that changes between small and big cube frames
 	bra	big_cube
 
 	
-vertical_sweep:			; Pattern that sweeps horsontal layers of the cube
+vertical_sweep:			; Pattern that sweeps vertical layers of the cube
     
     row1:
 	lfsr	0, 0x410	; Load FSR with starting point of pattern
@@ -228,9 +232,124 @@ diagonal_fill:			; Pattern that fills and then empties diagonal "rows" of the cu
 	bra	fill1
     
     
-;voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
-    
+voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
+	clrf	LATH
+	clrf	LATD
+	clrf	LATE
+	movlw	4
+	movwf	layer_counter	    ; Set up counter to 4
+	bsf	LATH, 0		    ; Start with bottom layer
 	
+    layers:
+	movlw	3
+	movwf	nibble_counter	    ; Set up counter to 3
+	bsf	LATD, 0		    ; Light first LED
+	
+    D_nibble1:			    ; Cycle through all PORTD first nibble LEDs
+	call	long_delay	    ; Delay to visible speeds
+	rlncf	LATD, F, A	    ; Rotate bit to light next LED
+	call	long_delay
+	decfsz	nibble_counter
+	bra	D_nibble1
+	clrf	LATD		    ; Clear D once finished
+	movlw	3		    ; Start counting again
+	movwf	nibble_counter
+	bsf	LATD, 7
+	
+    D_nibble2:			    ; Repeat for second nibble
+	call	long_delay
+	rrncf	LATD, F, A	    ; Rotate right this time
+	call	long_delay
+	decfsz	nibble_counter
+	bra	D_nibble2
+	clrf	LATD
+	movlw	3
+	movwf	nibble_counter
+	bsf	LATE, 4 
+	
+    E_nibble2:			    ; Now repeat for PORTE, i.e second half of a layer 
+	call	long_delay
+	rlncf	LATE, F, A
+	call	long_delay
+	decfsz	nibble_counter
+	bra	E_nibble2
+	clrf	LATE
+	movlw	3
+	movwf	nibble_counter
+	bsf	LATE, 3
+	
+    E_nibble1:
+	call	long_delay
+	rrncf	LATE, F, A
+	call	long_delay
+	decfsz	nibble_counter
+	bra	E_nibble1
+	clrf	LATE
+	
+	decfsz	layer_counter	    ; Count to 4 for each horisontal layer
+	bra	$+4		    
+	bra	voxel_cycle	    ; If 0, start whole cycle again
+	
+	movf	LATH, 0,0	    ; If not 0 yet, move on to next layer by rotating bit in H
+	clrf	LATH
+	rlncf	WREG, F, A	    
+	movwf	LATH
+	bra	layers
+	
+cross:				    ; Static cross pattern (viewed from side)
+    	lfsr	0, 0x498	    ; load FSR with starting point of pattern in the table
+	call	static_output
+	bra	cross
+
+part_filled:			    ; Static pattern, part-filled cube form one corner
+    	lfsr	0, 0x4A0	    ; load FSR with starting point of pattern in the table
+	call	static_output
+	bra	part_filled
+	
+edges_column_cycle:
+	movlw	0b11111111
+	movwf	LATH		    ; Switch on all layers
+	movlw	3
+	movwf	nibble_counter	    ; Count to 3 to rotate 3 times
+	bsf	LATD, 0
+	
+    edge1:
+	call	long_delay
+	rlncf	LATD
+	decfsz	nibble_counter
+	bra	edge1
+	call	long_delay
+	clrf	LATD
+	
+    edge2:
+	bsf	LATD, 7
+	call	long_delay
+	bcf	LATD, 7
+	bsf	LATE, 7
+	call	long_delay
+	bcf	LATE, 7
+	bsf	LATE, 3
+	movlw	3
+	movwf	nibble_counter	
+	
+    edge3:
+	call	long_delay
+	rrncf	LATE
+	decfsz	nibble_counter
+	bra	edge3
+	call	long_delay
+	clrf	LATE
+	
+    edge4:
+	bsf	LATE, 4
+	call	long_delay
+	bcf	LATE, 4
+	bsf	LATD, 4
+	call	long_delay
+	bcf	LATD, 4
+	bra	edges_column_cycle
+	
+    
 ; ****** Delays ******
 	
 short_delay:
@@ -245,7 +364,7 @@ medium_delay:
 	movwf	delay_counter2
 	call	short_delay
 	decfsz	delay_counter2
-	bra	$-4
+	bra	$-6
 	return
 	
 long_delay:
@@ -253,6 +372,13 @@ long_delay:
 	movwf	delay_counter3
 	call	medium_delay
 	decfsz	delay_counter3
-	bra	$-4
+	bra	$-6
 	return
-    
+	
+very_long_delay:
+	movlw	0x05
+	movwf	delay_counter4
+	call	long_delay
+	decfsz	delay_counter4
+	bra	$-6
+	return

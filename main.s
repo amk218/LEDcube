@@ -4,7 +4,8 @@
 ;extrn	High_priority_interrupt, Low_priority_interrupt, Interrupt_setup ; From interrupt.s
 extrn	load_to_RAM ; From Pattern_table.s	
 extrn	layer_by_layer ; From Patterns.s
-extrn	cube_frame, small_and_big, vertical_sweep, diagonal_fill
+extrn	cube_frame, small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
+extrn	edges_column_cycle, part_filled, cross
 extrn	pattern_timer_setup
 	
 
@@ -28,11 +29,19 @@ setup:			    ; Set ports D-F as outputs and clear them
 	;call	Interupt_setup
 	goto	start
 
-
+	
+;pattern_lookup:
+	;goto	layer_by_layer
+	;goto	small_and_big
+	;goto	vertical_sweep
+	;goto	cube_frame
+	;goto	voxel_cycle
+	;goto	diagonal_fill
 	
 start:
 
-	call	diagonal_fill
+	call	part_filled
 	bra	$
 
 	end	start
+
