@@ -1,7 +1,7 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi, High_priority_interrupt, Low_priority_interrupt, Interrupt_setup
-    
+;global	DAC_Setup, DAC_Int_Hi, High_priority_interrupt, Low_priority_interrupt, Interrupt_setup
+global pattern_timer_setup
 psect	dac_code, class=CODE
 	
 DAC_Int_Hi:	
@@ -19,6 +19,12 @@ DAC_Setup:
 	bsf	TMR0IE		; Enable timer0 interrupt
 	bsf	GIE		; Enable all interrupts
 	return
+	
+pattern_timer_setup:
+	movlw	10000110B	; Set timer0 to 16-bit, Fosc/4/128
+	movwf	T0CON, A	; = 62.5KHz clock rate, approx 0.5sec rollover
+	return
+	
 	
 
     

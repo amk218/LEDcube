@@ -30,13 +30,12 @@ setup:			    ; Set ports D-F as outputs and clear them
 	goto	start
 
 	
-;pattern_lookup:
-	;goto	layer_by_layer
-	;goto	small_and_big
-	;goto	vertical_sweep
-	;goto	cube_frame
-	;goto	voxel_cycle
-	;goto	diagonal_fill
+	goto	layer_by_layer
+	goto	small_and_big
+	goto	vertical_sweep
+	goto	cube_frame
+	goto	voxel_cycle
+	goto	diagonal_fill
 	
 start:
 
