@@ -5,7 +5,7 @@
 extrn	load_to_RAM ; From Pattern_table.s	
 extrn	layer_by_layer ; From Patterns.s
 extrn	cube_frame, small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
-extrn	edges_column_cycle, part_filled, cross
+extrn	edges_column_cycle, part_filled, cross, three_cubes, random_noise, rain
 extrn	pattern_timer_setup
 	
 
@@ -40,7 +40,7 @@ setup:			    ; Set ports D-F as outputs and clear them
 	
 start:
 
-	call	part_filled
+	call	cube_frame
 	bra	$
 
 	end	start

@@ -2,7 +2,7 @@
 
 global	layer_by_layer, cube_frame, edges_column_cycle
 global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
-global	part_filled, cross
+global	part_filled, cross, three_cubes, random_noise, rain
 
     
 psect   udata_acs
@@ -349,6 +349,125 @@ edges_column_cycle:
 	bcf	LATD, 4
 	bra	edges_column_cycle
 	
+random_noise:			; Pattern that lights up a random bunch on pixel on the cube
+    
+    part1:
+	lfsr	0, 0x4A8	; Load FSR with starting point of pattern
+	call	static_output
+	btfss	TMR0IF		; Check if timer flag has been set,
+	bra	part1		; if not, keep displaying
+	bcf	TMR0IF		; If yes, clear timer flag and continue to next part
+	
+    part2:
+	lfsr	0, 0x4B0
+	call	static_output
+	btfss	TMR0IF
+	bra	part2
+	bcf	TMR0IF
+	
+    part3:
+	lfsr	0, 0x4B8
+	call	static_output
+	btfss	TMR0IF
+	bra	part3
+	bcf	TMR0IF
+	
+    part4:
+	lfsr	0, 0x4C0
+	call	static_output
+	btfss	TMR0IF
+	bra	part4
+	bcf	TMR0IF
+	bra	part1
+	
+three_cubes:
+    
+    two:
+	lfsr	0, 0x4C8
+	call	static_output
+	btfss	TMR0IF
+	bra	two
+	bcf	TMR0IF
+	
+    three:
+    	lfsr	0, 0x4D0
+	call	static_output
+	btfss	TMR0IF
+	bra	three
+	bcf	TMR0IF
+	
+    four:
+    	lfsr	0, 0x400
+	call	static_output
+	btfss	TMR0IF
+	bra	four
+	bcf	TMR0IF
+
+    three_back:
+	lfsr	0, 0x4D0
+	call	static_output
+	btfss	TMR0IF
+	bra	three_back
+	bcf	TMR0IF
+	bra	two
+	
+rain:
+    set1:
+	lfsr	0, 0x4D8
+	call	static_output
+	btfss	TMR0IF
+	bra	set1
+	bcf	TMR0IF
+	
+    set2:
+	lfsr	0, 0x4E0
+	call	static_output
+	btfss	TMR0IF
+	bra	set2
+	bcf	TMR0IF
+	
+    set3:
+	lfsr	0, 0x4E8
+	call	static_output
+	btfss	TMR0IF
+	bra	set3
+	bcf	TMR0IF
+	
+    set4:
+	lfsr	0, 0x4F0
+	call	static_output
+	btfss	TMR0IF
+	bra	set4
+	bcf	TMR0IF
+	
+    set5:
+	lfsr	0, 0x4F8
+	call	static_output
+	btfss	TMR0IF
+	bra	set5
+	bcf	TMR0IF
+
+    set6:
+	lfsr	0, 0x500
+	call	static_output
+	btfss	TMR0IF
+	bra	set6
+	bcf	TMR0IF
+	
+    set7:
+	lfsr	0, 0x508
+	call	static_output
+	btfss	TMR0IF
+	bra	set7
+	bcf	TMR0IF
+	
+    set8:
+	lfsr	0, 0x510
+	call	static_output
+	btfss	TMR0IF
+	bra	set8
+	bcf	TMR0IF
+	bra	set1
     
 ; ****** Delays ******
 	
