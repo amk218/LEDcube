@@ -1,9 +1,11 @@
 #include <xc.inc>
 
+
 extrn	Interrupt_setup, High_priority_interrupt
 extrn	High_priority_interrupt, Low_priority_interrupt, Interrupt_setup ; From interrupt.s
 extrn	load_to_RAM ; From Pattern_table.s	
 extrn	single_layer_test, layer_by_layer, static_output ; From Patterns.s		
+
 
 global	pattern_counter    
     
@@ -28,6 +30,7 @@ setup:			    ; Set ports D-F as outputs and clear them
 	clrf	LATH, A
 	clrf	TRISE, A
 	clrf	LATE, A
+
 	movlw	0b11111111
 	movwf	TRISB, A
 	call	load_to_RAM
@@ -35,12 +38,22 @@ setup:			    ; Set ports D-F as outputs and clear them
 	movlw	pattern_number
 	movwf	pattern_counter
 
+
+	call	pattern_timer_setup ; Setup a timer for moving patterns
+
 	goto	start
 
-
-
+	
+;pattern_lookup:
+	;goto	layer_by_layer
+	;goto	small_and_big
+	;goto	vertical_sweep
+	;goto	cube_frame
+	;goto	voxel_cycle
+	;goto	diagonal_fill
 	
 start:
+
 	;call	light_sensor_loop
 	
 Pattern_select:
@@ -48,7 +61,8 @@ Pattern_select:
 	addwf	W,W,A
 	addwf	PCL, F, A
 	   ; Lookup table goes here
-	
+
 	bra	$
 
 	end	start
+
