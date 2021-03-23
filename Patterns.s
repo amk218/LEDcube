@@ -3,6 +3,8 @@
 global	layer_by_layer, cube_frame, edges_column_cycle
 global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
 global	part_filled, cross, three_cubes, random_noise, rain
+    
+extrn	pattern_counter
 
     
 psect   udata_acs
@@ -53,6 +55,9 @@ layer_by_layer:			; lights up the layers going up, and down, and up, and down ..
 	movwf	LATE, A
 	
     layer_loop:
+	movlw	1
+	cpfseq	pattern_counter
+	return
 	bsf	LATH, 0, A	; Light bottom layer
 	call	very_long_delay	; delay to visible speeds
 	bsf	LATH, 1, A	; light 2nd layer
