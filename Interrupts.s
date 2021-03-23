@@ -25,16 +25,16 @@ High_priority_interrupt:
     bra	    change_pattern
     ;check for light sensor
     ;go to light override
-    bcf	    INT1IF
+    bsf	    GIE
     retfie  f
 
 
     
 change_pattern:			    ; High priority interupt that will change the pattern cycle on button press
-    pop				    ; remove return from stack
-    bcf	    INT1IF		    ; clear the interrupt flag
+    bcf	    INT1IF
     bsf	    GIE
     decfsz  pattern_counter	    ; change pattern counter (i.e. pattern)
-    goto    pattern_select	    ; select new pattern
-    movf    pattern_number, W, A    ; if pattern number is maxed then reset counter
-    goto    pattern_select	    ; select new pattern after counter reset
+    return			    ; select new pattern
+    movlw   pattern_number	    ; if pattern number is maxed then reset counter
+    movwf   pattern_counter
+    return

@@ -11,7 +11,7 @@ global	pattern_counter, pattern_number, pattern_select
     
 psect	udata_acs   ; reserve data space in access ram
 pattern_counter:    ds 1    ; reserve one byte for a counter variable 
-pattern_number EQU  7	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
+pattern_number EQU  3	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
     
 psect	code, abs
 
@@ -51,19 +51,11 @@ start:
 	;call	light_sensor_loop
 	
 pattern_select:
-	movf	pattern_counter, W, A
-	addlw	0xFF
-	addwf	WREG,A
-	addwf	WREG,A
-	addwf	PCL, F, A
 	   ; Lookup table goes here
-	goto	layer_by_layer
-	goto	small_and_big
-	goto	vertical_sweep
-	goto	cube_frame
-	goto	voxel_cycle
-	goto	diagonal_fill
-	goto	edges_column_cycle
+	call	layer_by_layer
+	call	small_and_big
+	call	vertical_sweep
+	bra	pattern_select
 	
 	
 	

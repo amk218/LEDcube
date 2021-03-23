@@ -87,7 +87,9 @@ cube_frame:			; Static pattern that displays only the cube frame
 	
     
 small_and_big:			; Pattern that changes between small and big cube frames
-
+	movlw	2
+	cpfseq	pattern_counter
+	return
     big_cube:
 	lfsr	0, 0x400	; Load FSR with starting point of cube frame in the table
 	call	static_output
@@ -100,11 +102,13 @@ small_and_big:			; Pattern that changes between small and big cube frames
 	btfss	TMR0IF
 	bra	small_cube
 	bcf	TMR0IF
-	bra	big_cube
+	bra	small_and_big
 
 	
 vertical_sweep:			; Pattern that sweeps vertical layers of the cube
-    
+	movlw	3
+	cpfseq	pattern_counter
+	return
     row1:
 	lfsr	0, 0x410	; Load FSR with starting point of pattern
 	call	static_output
@@ -132,7 +136,7 @@ vertical_sweep:			; Pattern that sweeps vertical layers of the cube
 	btfss	TMR0IF		
 	bra	row4
 	bcf	TMR0IF
-	bra	row1		; Go back to 1st row when done
+	bra	vertical_sweep		; Go back to 1st row when done
 	
 	
 diagonal_fill:			; Pattern that fills and then empties diagonal "rows" of the cube
