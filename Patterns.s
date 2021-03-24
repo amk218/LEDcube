@@ -58,6 +58,7 @@ layer_by_layer:			; lights up the layers going up, and down, and up, and down ..
 	movlw	1
 	cpfseq	pattern_counter
 	return
+	
 	bsf	LATH, 0, A	; Light bottom layer
 	call	very_long_delay	; delay to visible speeds
 	bsf	LATH, 1, A	; light 2nd layer
