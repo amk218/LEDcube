@@ -23,7 +23,7 @@ psect	patterns, class=CODE
 ; ****** Helper routines for patterns ******
     
 
-static_output:		; Subroutine to display	a static pattern on the layers
+static_output:		; Subroutine to display	any static pattern on the layers
 	; Need to load FSR with starting address of pattern table before this routine!
 	movlw	4
 	movwf	layer_counter, A

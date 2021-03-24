@@ -35,15 +35,11 @@ setup:			    ; Set ports D-F as outputs and clear them
 	movwf	TRISB, A
 	call	load_to_RAM
 	call	Interrupt_setup
-
-
-
 	call	pattern_timer_setup ; Setup a timer for moving patterns
 
 	goto	start
 
 	
-
 	
 start:
 	movlw	pattern_number
@@ -51,7 +47,7 @@ start:
 	;call	light_sensor_loop
 	
 pattern_select:
-	movf	pattern_counter, W, A
+	movff	pattern_counter, WREG
 	addlw	0xFF
 	addwf	WREG,A
 	addwf	WREG,A

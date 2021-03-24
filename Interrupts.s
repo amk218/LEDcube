@@ -36,5 +36,5 @@ change_pattern:			    ; High priority interupt that will change the pattern cycl
     bsf	    GIE
     decfsz  pattern_counter	    ; change pattern counter (i.e. pattern)
     goto    pattern_select	    ; select new pattern
-    movf    pattern_number, W, A    ; if pattern number is maxed then reset counter
+    movff   pattern_number, pattern_counter    ; if pattern number is maxed then reset counter
     goto    pattern_select	    ; select new pattern after counter reset
