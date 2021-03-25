@@ -22,6 +22,8 @@ load_to_RAM:
     loop: 
 	tblrd*+				    ; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0	    ; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+
+	movff	TABLAT, POSTINC0
 	decfsz	counter, A		    ; count down to zero
 	bra	loop			    ; keep going until finished
 	return
@@ -94,5 +96,5 @@ PatternTable:
 	db	0b00000000, 0b00100000, 0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000
 	db	0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000, 0b00000000, 0b00010000
 	
-	myTable_l   EQU	280	; length of data
+	myTable_l   EQU	140	; length of data
 	align	2
