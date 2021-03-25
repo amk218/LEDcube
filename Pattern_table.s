@@ -17,13 +17,15 @@ load_to_RAM:
 	movwf	TBLPTRH, A		    ; load high byte to TBLPTRH
 	movlw	low(PatternTable)	    ; address of data in PM
 	movwf	TBLPTRL, A		    ; load low byte to TBLPTRL
-	movlw	myTable_l		    ; bytes to read
-	movwf 	counter, A		    ; our counter register
-    loop: 
-	tblrd*+				    ; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0	    ; move data from TABLAT to (FSR0), inc FSR0	
-	tblrd*+
-	movff	TABLAT, POSTINC0
+
+	movlw	myTable_l		    ; Number of bytes to read / 2
+	movwf 	counter, A		    ; counter
+    loop:	
+	tblrd*+				    ; One byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0	    ; Move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+				    ; Repeat
+	movff	TABLAT, POSTINC0	    
+	
 	decfsz	counter, A		    ; count down to zero
 	bra	loop			    ; keep going until finished
 	return
@@ -38,7 +40,7 @@ PatternArray2:    ds 0x100 ; reserve 256 bytes for message data
    
 
 psect	data    
-	; ******* myTable, data in programme memory, and its length *****
+	; ******* PatternTable, data in programme memory, and its length *****
 PatternTable:
 	;	layer 1			layer 2			layer 3			layer 4
 	
@@ -95,6 +97,8 @@ PatternTable:
 	db	0b00100000, 0b00000010, 0b00000000, 0b00100000, 0b00000000, 0b00000000, 0b10000000, 0b10000000
 	db	0b00000000, 0b00100000, 0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000
 	db	0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000, 0b00000000, 0b00010000
-	
-	myTable_l   EQU	140	; length of data
+
+
+	myTable_l   EQU	140	; length of data divided by 2
+
 	align	2

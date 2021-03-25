@@ -12,8 +12,8 @@ Interrupt_setup:
 	bsf	INT1IP
 	bsf	INTEDG1
 	bsf	RBPU		; disable PORTB pull ups
-
 	return
+	
 pattern_timer_setup:
 	movlw	10000110B	; Set timer0 to 16-bit, Fosc/4/128
 	movwf	T0CON, A	; = 62.5KHz clock rate, approx 0.5sec rollover
@@ -29,12 +29,13 @@ High_priority_interrupt:
     retfie  f
 
 
-    
 change_pattern:			    ; High priority interupt that will change the pattern cycle on button press
     bcf	    INT1IF
     bsf	    GIE
     decfsz  pattern_counter	    ; change pattern counter (i.e. pattern)
+
     return			    ; select new pattern
     movlw   pattern_number	    ; if pattern number is maxed then reset counter
     movwf   pattern_counter
     return
+

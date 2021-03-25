@@ -11,8 +11,9 @@ global	pattern_counter, pattern_number, pattern_select
     
 psect	udata_acs   ; reserve data space in access ram
 pattern_counter:    ds 1    ; reserve one byte for a counter variable 
-pattern_number EQU  3	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
-    
+
+pattern_number EQU  11	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
+
 psect	code, abs
 
 	org	0x0000
@@ -35,30 +36,26 @@ setup:			    ; Set ports D-F as outputs and clear them
 	movwf	TRISB, A
 	call	load_to_RAM
 	call	Interrupt_setup
-
-
-
 	call	pattern_timer_setup ; Setup a timer for moving patterns
 
 	goto	start
 
 	
-
-	
 start:
+
 	movlw	pattern_number
 	movwf	pattern_counter
 	;call	light_sensor_loop
 	
 pattern_select:
+
 	   ; Lookup table goes here
 	call	layer_by_layer
 	call	small_and_big
 	call	vertical_sweep
 	bra	pattern_select
 	
-	
-	
+
 	bra	$
 
 	end	start
