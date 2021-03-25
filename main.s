@@ -11,8 +11,9 @@ global	pattern_counter, pattern_number, pattern_select
     
 psect	udata_acs   ; reserve data space in access ram
 pattern_counter:    ds 1    ; reserve one byte for a counter variable 
+
 pattern_number EQU  11	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
-    
+
 psect	code, abs
 
 	org	0x0000
@@ -40,7 +41,6 @@ setup:			    ; Set ports D-F as outputs and clear them
 	goto	start
 
 	
-	
 start:
 
 	movlw	pattern_number
@@ -48,23 +48,14 @@ start:
 	;call	light_sensor_loop
 	
 pattern_select:
-	movff	pattern_counter, WREG
-	addlw	0xFF
-	addwf	WREG,A
-	addwf	WREG,A
-	addwf	PCL, F, A
+
 	   ; Lookup table goes here
-	goto	layer_by_layer
-	goto	small_and_big
-	goto	vertical_sweep
-	goto	cube_frame
-	goto	voxel_cycle
-	goto	diagonal_fill
-	goto	edges_column_cycle
-	goto	part_filled
-	goto	three_cubes
-	goto	random_noise
-	goto	rain
+	call	layer_by_layer
+	call	small_and_big
+	call	vertical_sweep
+	bra	pattern_select
+	
+
 	bra	$
 
 	end	start

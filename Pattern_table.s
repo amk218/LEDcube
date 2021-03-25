@@ -17,6 +17,7 @@ load_to_RAM:
 	movwf	TBLPTRH, A		    ; load high byte to TBLPTRH
 	movlw	low(PatternTable)	    ; address of data in PM
 	movwf	TBLPTRL, A		    ; load low byte to TBLPTRL
+
 	movlw	myTable_l		    ; Number of bytes to read / 2
 	movwf 	counter, A		    ; counter
     loop:	
@@ -97,6 +98,7 @@ PatternTable:
 	db	0b00000000, 0b00100000, 0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000
 	db	0b00000000, 0b00000000, 0b10000000, 0b10000000, 0b00000001, 0b00000000, 0b00000000, 0b00010000
 
-	
+
 	myTable_l   EQU	140	; length of data divided by 2
+
 	align	2
