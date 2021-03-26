@@ -5,14 +5,14 @@ extrn	Interrupt_setup, High_priority_interrupt, pattern_timer_setup; From interr
 extrn	load_to_RAM ; From Pattern_table.s			
 extrn	layer_by_layer, cube_frame, edges_column_cycle
 extrn	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
-extrn	part_filled, cross, three_cubes, random_noise, rain, fill_cube
+extrn	part_filled, cross, three_cubes, random_noise, rain, fill_cube, wave
 
 global	pattern_counter, pattern_number, pattern_select
     
 psect	udata_acs   ; reserve data space in access ram
 pattern_counter:    ds 1    ; reserve one byte for a counter variable 
 
-pattern_number EQU  12	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
+pattern_number EQU  13	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
 
 psect	code, abs
 
@@ -60,6 +60,7 @@ pattern_select:
 	call	three_cubes
 	call	diagonal_fill
 	call	random_noise
+	call	wave
 	bra	pattern_select
 	
 

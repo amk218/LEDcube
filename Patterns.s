@@ -2,7 +2,7 @@
 
 global	layer_by_layer, cube_frame, edges_column_cycle
 global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
-global	part_filled, cross, three_cubes, random_noise, rain, fill_cube
+global	part_filled, cross, three_cubes, random_noise, rain, fill_cube, wave
     
 extrn	pattern_counter
 
@@ -378,6 +378,15 @@ fill_cube:
 	call	dynamic_output
 	call	very_long_delay
 	bra	fill_cube
+	
+wave:
+	movlw	13
+	movwf	pattern_number  ; Set label of this pattern to 13
+	movlw	6
+	movwf	frame_counter
+	lfsr	0, 0x5C0
+	call	dynamic_output
+	bra	wave
     
 ; ********** Delays **********
 	

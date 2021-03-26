@@ -18,13 +18,17 @@ load_to_RAM:
 	movlw	low(PatternTable)	    ; address of data in PM
 	movwf	TBLPTRL, A		    ; load low byte to TBLPTRL
 
-	movlw	myTable_l		    ; Number of bytes to read / 2
+	movlw	myTable_l		    ; Number of bytes to read / 4
 	movwf 	counter, A		    ; counter
     loop:	
 	tblrd*+				    ; One byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0	    ; Move data from TABLAT to (FSR0), inc FSR0	
 	tblrd*+				    ; Repeat
-	movff	TABLAT, POSTINC0	    
+	movff	TABLAT, POSTINC0
+	tblrd*+				    ; Repeat
+	movff	TABLAT, POSTINC0
+	tblrd*+				    ; Repeat
+	movff	TABLAT, POSTINC0
 	
 	decfsz	counter, A		    ; count down to zero
 	bra	loop			    ; keep going until finished
@@ -32,10 +36,12 @@ load_to_RAM:
 	
 
 psect	udata_bank4 ; reserve data anywhere in RAM (here in 0x400)
-PatternArray:    ds 0x100 ; reserve 256 bytes for message data
+PatternArray:    ds 0x100 ; reserve 256 bytes for data
     
 psect	udata_bank5 ; reserve data anywhere in RAM (here in 0x500)
-PatternArray2:    ds 0x100 ; reserve 256 bytes for message data
+PatternArray2:    ds 0x100 ; reserve 256 bytes for data
+psect	udata_bank6 ; reserve data anywhere in RAM (here in 0x600)
+PatternArray3:	  ds 0x100 ; reserve 256 bytes for data
    
    
 
@@ -121,6 +127,14 @@ PatternTable:
 	db	0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111
 	db	0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111
 	
-	myTable_l   EQU	248	; length of data divided by 2
+	; Wave
+	db	0b00001111, 0b00000000, 0b11110000, 0b00000000, 0b00000000, 0b11110000, 0b00000000, 0b00001111
+	db	0b11110000, 0b00000000, 0b00001111, 0b11110000, 0b00000000, 0b00001111, 0b00000000, 0b00000000
+	db	0b00000000, 0b11110000, 0b11110000, 0b00001111, 0b00001111, 0b00000000, 0b00000000, 0b00000000
+	db	0b00000000, 0b00001111, 0b00000000, 0b11110000, 0b11110000, 0b00000000, 0b00001111, 0b00000000
+	db	0b00000000, 0b00000000, 0b00000000, 0b00001111, 0b00001111, 0b11110000, 0b11110000, 0b00000000
+	db	0b00000000, 0b00000000, 0b00001111, 0b00000000, 0b11110000, 0b00001111, 0b00000000, 0b11110000
+	
+	myTable_l   EQU	124	; length of data divided by 4
 
 	align	2
