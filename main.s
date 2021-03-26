@@ -1,3 +1,4 @@
+ 
 #include <xc.inc>
 
 
@@ -6,6 +7,7 @@ extrn	load_to_RAM ; From Pattern_table.s
 extrn	layer_by_layer, cube_frame, edges_column_cycle
 extrn	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
 extrn	part_filled, cross, three_cubes, random_noise, rain, fill_cube, wave
+extrn	Light_sensor_setup, light_sensor_get_data
 
 global	pattern_counter, pattern_number, pattern_select
     
@@ -37,6 +39,7 @@ setup:			    ; Set ports D-F as outputs and clear them
 	call	load_to_RAM
 	call	Interrupt_setup
 	call	pattern_timer_setup ; Setup a timer for moving patterns
+	call	Light_sensor_setup
 
 	goto	start
 
@@ -45,7 +48,7 @@ start:
 	call	small_and_big
 	movlw	pattern_number
 	movwf	pattern_counter
-	;call	light_sensor_loop
+	call	light_sensor_get_data
 	
 pattern_select:
 	call	fill_cube
@@ -67,4 +70,3 @@ pattern_select:
 	bra	$
 
 	end	start
-
