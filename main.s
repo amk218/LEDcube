@@ -5,14 +5,14 @@ extrn	Interrupt_setup, High_priority_interrupt, pattern_timer_setup; From interr
 extrn	load_to_RAM ; From Pattern_table.s			
 extrn	layer_by_layer, cube_frame, edges_column_cycle
 extrn	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
-extrn	part_filled, cross, three_cubes, random_noise, rain
+extrn	part_filled, cross, three_cubes, random_noise, rain, fill_cube
 
 global	pattern_counter, pattern_number, pattern_select
     
 psect	udata_acs   ; reserve data space in access ram
 pattern_counter:    ds 1    ; reserve one byte for a counter variable 
 
-pattern_number EQU  11	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
+pattern_number EQU  12	    ; This is the number of available patterns (THIS MUST BE UPDATED WITH ANY NEW PATTERN)
 
 psect	code, abs
 
@@ -42,17 +42,24 @@ setup:			    ; Set ports D-F as outputs and clear them
 
 	
 start:
-
+	call	small_and_big
 	movlw	pattern_number
 	movwf	pattern_counter
 	;call	light_sensor_loop
 	
 pattern_select:
-
-	   ; Lookup table goes here
+	call	fill_cube
 	call	layer_by_layer
 	call	small_and_big
+	call	part_filled
+	call	voxel_cycle
 	call	vertical_sweep
+	call	cube_frame
+	call	edges_column_cycle
+	call	rain
+	call	three_cubes
+	call	diagonal_fill
+	call	random_noise
 	bra	pattern_select
 	
 
