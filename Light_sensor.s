@@ -11,7 +11,7 @@ sensor_high:    ds 1    ; reserve one byte for high byte of counter measurement
 psect	Light_sensor, class = CODE
 
 Light_sensor_setup:
-	movlw	0b00000000
+	movlw	0b00010000
 	movwf	TRISC, A	    ; clear SPI port (except for MISO pin)
 	clrf	TRISE, A	    ; clear chip select port
 	bcf	SSP1STAT,7,A	    ; sample data at end of output time
