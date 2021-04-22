@@ -4,7 +4,7 @@ global	layer_by_layer, cube_frame, edges_column_cycle
 global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
 global	part_filled, cross, three_cubes, random_noise, rain, fill_cube, wave
     
-extrn	pattern_counter
+extrn	pattern_counter, light_sensor_get_data
 
   
 psect   udata_acs
@@ -76,6 +76,7 @@ dynamic_output:			; Subroutine to show any multi-step animated pattern
 	
 	
 pattern_check:  ; Subroutine to check current pattern counter value
+	call	light_sensor_get_data
 	movff	pattern_number, WREG	; Check if pattern counter still
 	cpfseq	pattern_counter	; corresponds to given pattern number
 	bra	back_to_main
