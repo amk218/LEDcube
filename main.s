@@ -43,7 +43,6 @@ setup:			    ; Set ports D-F as outputs and clear them
 
 	goto	start
 
-	
 start:
 	call	small_and_big
 	movlw	pattern_number

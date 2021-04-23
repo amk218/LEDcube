@@ -28,7 +28,7 @@ light_sensor_get_data:
 wait_high:
 	btfss	SSP1STAT, 0,A	    ; check whether recieve complete
 	bra	wait_high
-	movff	SSP1BUF,PORTD;sensor_high	    ; save high byte
+	movff	SSP1BUF, sensor_high	    ; save high byte
 	bcf	SSP1STAT, 0,A	    ; reset transmission flag
 	movlw	0b10011001
 	movwf	SSP1BUF, A	    ; begin recieve
@@ -36,14 +36,14 @@ wait_low:
 	btfss	SSP1STAT, 0,A	    ; check whether recieve complete
 	bra	wait_low
 
-	movff	SSP1BUF,PORTE; sensor_low	    ; save low byte (actually low nibble twice back to back)
+	movff	SSP1BUF, sensor_low	    ; save low byte (actually low nibble twice back to back)
 	bcf	SSP1STAT, 0,A	    ; reset transmission flag
 	bsf	RE0		    ; end transmission
 
 	;return			    revove for main program, insert for testing only
 
 light_level_test:
-	movlw	0b00001000	    ; high byte comparison (max light level)
+	movlw	0b00000001	    ; high byte comparison (max light level)
 	cpfslt	sensor_high	    ; loops and gets new data is light level too high
 	bra	light_sensor_get_data
 	return			    ; if light level low enough, go back to main
