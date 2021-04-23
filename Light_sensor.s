@@ -36,7 +36,7 @@ wait_low:
 	btfss	SSP1STAT, 0,A	    ; check whether recieve complete
 	bra	wait_low
 
-	movff	SSP1BUF,PORTE; sensor_low	    ; save low byte (actually low nibble twice back to back)
+	movff	SSP1BUF,PORTJ; sensor_low	    ; save low byte (actually low nibble twice back to back)
 	bcf	SSP1STAT, 0,A	    ; reset transmission flag
 	bsf	RE0		    ; end transmission
 

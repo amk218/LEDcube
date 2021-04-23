@@ -42,11 +42,11 @@ static_output:		; Subroutine to display	any static pattern on the layers
 	movff	INDF0, LATD, A	; Take value from address pointed to by FSR and output to D
 	call	medium_delay
 	incf	FSR0, A		; Increment FSR
-	movff	INDF0, LATE, A	; Output the following byte to E
+	movff	INDF0, LATJ, A	; Output the following byte to E
 	call	medium_delay
 	incf	FSR0, A
 	clrf	LATD
-	clrf	LATE
+	clrf	LATJ
 	rlncf	LATH, F, A	; Rotate bit in H to activate next layer
 	
 	decfsz	layer_counter, A ; Decrement layer counter
@@ -97,7 +97,7 @@ layer_by_layer:			; Pattern that lights up the layers going up and down
 	movlw	0b11111111	; Set all columns high to light all LED in a layer
 	movwf	LATD, A
 	movlw	0b11111111
-	movwf	LATE, A
+	movwf	LATJ, A
 	bsf	LATH, 0, A	; Light bottom layer
 	
     up:
@@ -161,7 +161,7 @@ diagonal_fill:			; Pattern that fills and then empties diagonal "rows" of the cu
 	lfsr	0, 0x430	; Load FSR with starting point of pattern
 	call	dynamic_output
     empty:			; Display empty cube in between rounds
-	clrf	LATE
+	clrf	LATJ
 	clrf	LATD
 	movlw	1
 	movwf	stack_depth
@@ -179,7 +179,7 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 	movwf	pattern_number	    ; Set label of this pattern to 5
 	clrf	LATH
 	clrf	LATD
-	clrf	LATE
+	clrf	LATJ
 	movlw	4
 	movwf	layer_counter	    ; Set up counter to 4
 	bsf	LATH, 0		    ; Start with bottom layer
@@ -211,28 +211,28 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 	clrf	LATD
 	movlw	3
 	movwf	nibble_counter
-	bsf	LATE, 4 
+	bsf	LATJ, 4 
 	
-    E_nibble2:			    ; Now repeat for PORTE, i.e second half of a layer
+    E_nibble2:			    ; Now repeat for PORTJ, i.e second half of a layer
 	call	pattern_check
 	call	long_delay
-	rlncf	LATE, F, A
+	rlncf	LATJ, F, A
 	call	long_delay
 	decfsz	nibble_counter
 	bra	E_nibble2
-	clrf	LATE
+	clrf	LATJ
 	movlw	3
 	movwf	nibble_counter
-	bsf	LATE, 3
+	bsf	LATJ, 3
 	
     E_nibble1:
 	call	pattern_check
 	call	long_delay
-	rrncf	LATE, F, A
+	rrncf	LATJ, F, A
 	call	long_delay
 	decfsz	nibble_counter
 	bra	E_nibble1
-	clrf	LATE
+	clrf	LATJ
 	
 	decfsz	layer_counter	    ; Count to 4 for each horisontal layer
 	bra	$+4		    
@@ -283,27 +283,27 @@ edges_column_cycle:
 	bsf	LATD, 7
 	call	long_delay
 	bcf	LATD, 7
-	bsf	LATE, 7
+	bsf	LATJ, 7
 	call	long_delay
-	bcf	LATE, 7
-	bsf	LATE, 3
+	bcf	LATJ, 7
+	bsf	LATJ, 3
 	movlw	3
 	movwf	nibble_counter	
 	
     edge3:
 	call	pattern_check
 	call	long_delay
-	rrncf	LATE
+	rrncf	LATJ
 	decfsz	nibble_counter
 	bra	edge3
 	call	long_delay
-	clrf	LATE
+	clrf	LATJ
 	
     edge4:
 	call	pattern_check
-	bsf	LATE, 4
+	bsf	LATJ, 4
 	call	long_delay
-	bcf	LATE, 4
+	bcf	LATJ, 4
 	bsf	LATD, 4
 	call	long_delay
 	bcf	LATD, 4
