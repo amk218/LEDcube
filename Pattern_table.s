@@ -1,14 +1,24 @@
 #include <xc.inc>
+; This file contains the pattern data, and a routine to load the data from program
+; memory into data memory
     
+; ********** External and global modules **********
 global	load_to_RAM
      
+; ********** Variables and bank space **********     
+psect	udata_acs   ; reserve data space in access RAM
+counter:    ds 1    ; reserve one byte for a counter variable
+
+psect	udata_bank4 ; reserve data anywhere in RAM (here in 0x400)
+PatternArray:    ds 0x100 ; reserve 256 bytes for data
+psect	udata_bank5 ; reserve data anywhere in RAM (here in 0x500)
+PatternArray2:    ds 0x100 ; reserve 256 bytes for data
+psect	udata_bank6 ; reserve data anywhere in RAM (here in 0x600)
+PatternArray3:	  ds 0x100 ; reserve 256 bytes for data 
     
-psect	udata_acs   ; reserve data space in access ram
-counter:    ds 1    ; reserve one byte for a counter variable    
-    
+; ********** Code to load data to RAM **********
 psect	pattern_table, class=CODE 
-    
-       
+        
 load_to_RAM: 	
 	lfsr	0, PatternArray		    ; Load FSR0 with address in RAM	
 	movlw	low highword(PatternTable)  ; address of data in PM
@@ -35,18 +45,8 @@ load_to_RAM:
 	return
 	
 
-psect	udata_bank4 ; reserve data anywhere in RAM (here in 0x400)
-PatternArray:    ds 0x100 ; reserve 256 bytes for data
-    
-psect	udata_bank5 ; reserve data anywhere in RAM (here in 0x500)
-PatternArray2:    ds 0x100 ; reserve 256 bytes for data
-psect	udata_bank6 ; reserve data anywhere in RAM (here in 0x600)
-PatternArray3:	  ds 0x100 ; reserve 256 bytes for data
-   
-   
-
-psect	data    
-	; ******* PatternTable, data in programme memory, and its length *****
+; ********** PatternTable, data in programme memory, and its length ***********
+psect	data  
 PatternTable:
 	;	layer 1			layer 2			layer 3			layer 4
 	
