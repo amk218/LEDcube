@@ -32,7 +32,7 @@ setup:			    ; Set ports D-F as outputs and clear them
 	clrf	TRISH, A
 	clrf	LATH, A
 	clrf	TRISE, A
-	clrf	LATE, A
+	clrf	LATJ, A
 
 	movlw	0b11111111
 	movwf	TRISB, A
