@@ -1,14 +1,18 @@
 #include <xc.inc>
-
-global	layer_by_layer, cube_frame, edges_column_cycle
+; This file contains all routines related to the light patterns
+    
+; ********** External and global modules **********
+    
+global	layer_by_layer, cube_frame, edges_column_cycle, pattern_timer_setup
 global	small_and_big, vertical_sweep, diagonal_fill, voxel_cycle
 global	part_filled, cross, three_cubes, random_noise, rain, fill_cube, wave
     
-extrn	pattern_counter, light_sensor_get_data
+extrn	pattern_counter, get_light_sensor_data
 
-  
+
+; ********** Variables **********    
 psect   udata_acs
-; ********** Variables **********     
+   
 pattern_number:ds   1		; Variable to hold the number label of each pattern
 layer_counter: ds   1		; A counter to track layers
 delay_counter1:ds   1		; Counters for program delays
@@ -20,15 +24,21 @@ nibble_counter:ds   1
 frame_counter: ds   1		; Number of animation frames for moving patterns
 stack_depth:   ds   1		; Variable: 0 if depth=2, 1 if depth=1
     
-
     
+; ********** Pattern timer setup **********
 psect	patterns, class=CODE
+    
+pattern_timer_setup:
+	movlw	10000100B	; Set timer0 to 16-bit, Fosc/4/64
+	movwf	T0CON, A	; = 62.5KHz clock rate, approx 0.25sec rollover
+	return
 
 ; ********** Helper routines for patterns **********
     
-
 static_output:		; Subroutine to display	any static pattern on the layers
 	; Need to load FSR0 with starting address of pattern table before this routine!
+	; This subroutine cycles through the layers once, without delays, to create an
+	; illusion that all layers are on simultaneously
 	movlw	1
 	movwf	stack_depth
 	movlw	4
@@ -48,11 +58,11 @@ static_output:		; Subroutine to display	any static pattern on the layers
 	clrf	LATD
 	clrf	LATJ
 	rlncf	LATH, F, A	; Rotate bit in H to activate next layer
-	
+				
 	decfsz	layer_counter, A ; Decrement layer counter
 	bra	layer_cycle
 	
-    reset_FSR:
+    reset_FSR:			; Reset file select register value
 	decf	FSR0, A
 	decfsz	byte_counter
 	bra	reset_FSR
@@ -61,13 +71,16 @@ static_output:		; Subroutine to display	any static pattern on the layers
 	
 dynamic_output:			; Subroutine to show any multi-step animated pattern
 	; Need to load FSR0 with correct data address before calling this!
-	call	static_output	; Display static stage
+	; This subroutine
 	movlw	0
-	movwf	stack_depth
-	call	pattern_check	; Check for button press
+	movwf	stack_depth	; Set "stack depth" value for returning to main
+	
+	call	pattern_and_light_check	; Check for button press and light level
+	call	static_output	; Display static frame
+	
 	btfss	TMR0IF		; Check if timer flag has been set,
-	bra	dynamic_output	; if not, keep displaying
-	bcf	TMR0IF		; If yes, clear timer flag and continue
+	bra	dynamic_output	; if not, keep displaying the same frame
+	bcf	TMR0IF		; If yes, clear timer flag and continue to next frame
 	movlw	8
 	addwf	FSR0, A		; Increment FSR0 by 8 to move onto next frame
 	decfsz	frame_counter	; Count down all frames of animated pattern	
@@ -75,8 +88,8 @@ dynamic_output:			; Subroutine to show any multi-step animated pattern
 	return			; Go back to pattern subroutine
 	
 	
-pattern_check:  ; Subroutine to check current pattern counter value
-	call	light_sensor_get_data
+pattern_and_light_check:  ; Subroutine to check current pattern counter value and light level
+	call	get_light_sensor_data	; Check light level
 	movff	pattern_number, WREG	; Check if pattern counter still
 	cpfseq	pattern_counter	; corresponds to given pattern number
 	bra	back_to_main
@@ -86,6 +99,7 @@ pattern_check:  ; Subroutine to check current pattern counter value
 	btfss	stack_depth, 0	; Determine if 1 or 2 pops needed
 	pop
 	return			; Return to main program
+	
 	
 ; ********* Different pattern subroutines **********
 	
@@ -104,7 +118,7 @@ layer_by_layer:			; Pattern that lights up the layers going up and down
 	movlw	3
 	movwf	layer_counter	; Set a counter to 3
     up_loop:
-	call	pattern_check	; If not, return to main program
+	call	pattern_and_light_check	; If not, return to main program
 	call	very_long_delay	; Delay to visible speeds
 	rlncf	LATH, F, A	; Rotate bit in H to activate above layer
 	decfsz	layer_counter, A
@@ -114,7 +128,7 @@ layer_by_layer:			; Pattern that lights up the layers going up and down
 	movlw	3
 	movwf	layer_counter	; Reset layer counter back to 3 before going down
     down_loop:
-    	call	pattern_check
+    	call	pattern_and_light_check
 	call	very_long_delay	; Delay to visible speeds
 	rrncf	LATH, F, A	; Rotate bit in H to activate below layer
 	decfsz	layer_counter, A
@@ -129,7 +143,7 @@ cube_frame:			; Static pattern that displays only the cube frame
 	movwf	pattern_number	; Set label of this pattern to 7
     	lfsr	0, 0x400	; load FSR with starting point of pattern in the table
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	bra	cube_frame
 	
     
@@ -165,7 +179,7 @@ diagonal_fill:			; Pattern that fills and then empties diagonal "rows" of the cu
 	clrf	LATD
 	movlw	1
 	movwf	stack_depth
-	call	pattern_check
+	call	pattern_and_light_check
 	btfss	TMR0IF		
 	bra	empty
 	bcf	TMR0IF
@@ -190,7 +204,7 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 	bsf	LATD, 0		    ; Light first LED
 	
     D_nibble1:			    ; Cycle through all PORTD first nibble LEDs
-	call	pattern_check
+	call	pattern_and_light_check
 	call	long_delay	    ; Delay to visible speeds
 	rlncf	LATD, F, A	    ; Rotate bit to light next LED
 	call	long_delay
@@ -202,7 +216,7 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 	bsf	LATD, 7
 	
     D_nibble2:			    ; Repeat for second nibble
-	call	pattern_check
+	call	pattern_and_light_check
 	call	long_delay
 	rrncf	LATD, F, A	    ; Rotate right this time
 	call	long_delay
@@ -213,25 +227,25 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 	movwf	nibble_counter
 	bsf	LATJ, 4 
 	
-    E_nibble2:			    ; Now repeat for PORTJ, i.e second half of a layer
-	call	pattern_check
+    J_nibble2:			    ; Now repeat for PORTJ, i.e second half of a layer
+	call	pattern_and_light_check
 	call	long_delay
 	rlncf	LATJ, F, A
 	call	long_delay
 	decfsz	nibble_counter
-	bra	E_nibble2
+	bra	J_nibble2
 	clrf	LATJ
 	movlw	3
 	movwf	nibble_counter
 	bsf	LATJ, 3
 	
-    E_nibble1:
-	call	pattern_check
+    J_nibble1:
+	call	pattern_and_light_check
 	call	long_delay
 	rrncf	LATJ, F, A
 	call	long_delay
 	decfsz	nibble_counter
-	bra	E_nibble1
+	bra	J_nibble1
 	clrf	LATJ
 	
 	decfsz	layer_counter	    ; Count to 4 for each horisontal layer
@@ -247,7 +261,7 @@ voxel_cycle:			    ; Pattern that lights up each "voxel" one by one in order
 cross:				    ; Static cross pattern (viewed from side)
     	lfsr	0, 0x498	    ; load FSR with starting point of pattern in the table
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	bra	cross
 
 part_filled:			    ; Static pattern, part-filled cube form one corner
@@ -255,7 +269,7 @@ part_filled:			    ; Static pattern, part-filled cube form one corner
 	movwf	pattern_number	    ; Set label of this pattern to 4
     	lfsr	0, 0x4A0	    ; load FSR with starting point of pattern in the table
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	bra	part_filled
 	
 edges_column_cycle:
@@ -270,7 +284,7 @@ edges_column_cycle:
 	bsf	LATD, 0
 	
     edge1:
-	call	pattern_check
+	call	pattern_and_light_check
 	call	long_delay
 	rlncf	LATD
 	decfsz	nibble_counter
@@ -279,7 +293,7 @@ edges_column_cycle:
 	clrf	LATD
 	
     edge2:
-	call	pattern_check
+	call	pattern_and_light_check
 	bsf	LATD, 7
 	call	long_delay
 	bcf	LATD, 7
@@ -291,7 +305,7 @@ edges_column_cycle:
 	movwf	nibble_counter	
 	
     edge3:
-	call	pattern_check
+	call	pattern_and_light_check
 	call	long_delay
 	rrncf	LATJ
 	decfsz	nibble_counter
@@ -300,7 +314,7 @@ edges_column_cycle:
 	clrf	LATJ
 	
     edge4:
-	call	pattern_check
+	call	pattern_and_light_check
 	bsf	LATJ, 4
 	call	long_delay
 	bcf	LATJ, 4
@@ -326,7 +340,7 @@ three_cubes:
     two:
 	lfsr	0, 0x4C8
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	btfss	TMR0IF
 	bra	two
 	bcf	TMR0IF
@@ -334,7 +348,7 @@ three_cubes:
     three:
     	lfsr	0, 0x4D0
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	btfss	TMR0IF
 	bra	three
 	bcf	TMR0IF
@@ -342,7 +356,7 @@ three_cubes:
     four:
     	lfsr	0, 0x400
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	btfss	TMR0IF
 	bra	four
 	bcf	TMR0IF
@@ -350,7 +364,7 @@ three_cubes:
     three_back:
 	lfsr	0, 0x4D0
 	call	static_output
-	call	pattern_check
+	call	pattern_and_light_check
 	btfss	TMR0IF
 	bra	three_back
 	bcf	TMR0IF
