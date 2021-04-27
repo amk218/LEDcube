@@ -71,7 +71,9 @@ static_output:		; Subroutine to display	any static pattern on the layers
 	
 dynamic_output:			; Subroutine to show any multi-step animated pattern
 	; Need to load FSR0 with correct data address before calling this!
-	; This subroutine
+	; This subroutine will use static_output to display several static frames, timed by pre-set timer0.
+	; In addiion, every iteration checks for the button and light sensor inputs to determine
+	; if light level is low enough and if button press has changed the pattern counter
 	movlw	0
 	movwf	stack_depth	; Set "stack depth" value for returning to main
 	
@@ -324,7 +326,7 @@ edges_column_cycle:
 	bra	edges_column_cycle
 	
 	
-random_noise:			; Pattern that lights up a random bunch on pixel on the cube
+random_noise:			; Pattern that lights up a random bunch of pixels on the cube
     
 	movlw	12
 	movwf	pattern_number	; Set label of this pattern to 12
@@ -334,7 +336,7 @@ random_noise:			; Pattern that lights up a random bunch on pixel on the cube
 	call	dynamic_output
 	bra	random_noise
 		
-three_cubes:
+three_cubes:			; Pattern that displays 3 sizes of cubes in order
 	movlw	10
 	movwf   pattern_number	    ; Set label of this pattern to 10
     two:
@@ -370,7 +372,7 @@ three_cubes:
 	bcf	TMR0IF
 	bra	two
 	
-rain:
+rain:				; Pattern that mimics falling raindrops
 	movlw	9
 	movwf	pattern_number	; Set label of this pattern to 9
 	movlw	5
@@ -384,8 +386,8 @@ rain:
 	call	dynamic_output
 	bra	rain
 
-fill_cube:
-	movlw	1
+fill_cube:			; Pattern that lights up each LED in the cube in random order,
+	movlw	1		; a few at a time
 	movwf	pattern_number	; Set label of this pattern to 1
 	movlw	21
 	movwf	frame_counter
@@ -394,7 +396,7 @@ fill_cube:
 	call	very_long_delay
 	bra	fill_cube
 	
-wave:
+wave:				; Pattern that mimics an oscillating wave when viewed from the side
 	movlw	13
 	movwf	pattern_number  ; Set label of this pattern to 13
 	movlw	6
