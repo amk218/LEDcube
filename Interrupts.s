@@ -22,8 +22,6 @@ interrupt_setup:
 high_priority_interrupt:
     btfsc   INT1IF
     bra	    change_pattern
-    ;check for light sensor
-    ;go to light override
     bsf	    GIE
     retfie  f
 
