@@ -14,3 +14,6 @@ The project contains the following files:
 In order to run the project, all files must be in the project same project folder. Running main.s will operate the whole device with all functionality, and the program will keep running until the device is manually switched off.
 
 A video demonstration of the operation of the device can be found here: https://youtu.be/FoGqwxilCHo
+
+A full circuit diagram of the hardware construction can be seen below:
+[LED_Cube_Schematic.pdf](https://github.com/amk218/LEDcube/files/6417274/LED_Cube_Schematic.pdf)
