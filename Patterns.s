@@ -29,7 +29,7 @@ stack_depth:   ds   1		; Variable: 0 if depth=2, 1 if depth=1
 psect	patterns, class=CODE
     
 pattern_timer_setup:
-	movlw	10000100B	; Set timer0 to 16-bit, Fosc/4/64,
+	movlw	10000100B	; Set timer0 to 16-bit, Fosc/4/32,
 	movwf	T0CON, A	; approx 0.25sec rollover
 	return
 
