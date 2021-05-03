@@ -15,5 +15,5 @@ In order to run the project, all files must be in the project same project folde
 
 A video demonstration of the operation of the device can be found here: https://youtu.be/FoGqwxilCHo
 
-A full circuit diagram of the hardware construction can be seen below:
+A full circuit diagram of the hardware construction can be seen here:
 [LED_Cube_Schematic.pdf](https://github.com/amk218/LEDcube/files/6417274/LED_Cube_Schematic.pdf)
